@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CasaQuest</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="appHeader">
+      <div class="brand">
+        <div class="logo">🏠✨</div>
+        <div class="titles">
+          <div class="appName">CasaQuest</div>
+          <div class="tagline">Misiones rápidas · sin capataz · película al final 😄</div>
+        </div>
+      </div>
+
+      <nav class="topNav" aria-label="Navegación">
+        <button class="tab" data-route="today">Hoy</button>
+        <button class="tab" data-route="summary">Resumen</button>
+        <button class="tab" data-route="assignments">Asignaciones</button>
+        <button class="tab" data-route="settings">Ajustes</button>
+      </nav>
+
+      <div class="headerRight">
+        <button id="btnUser" class="chip" title="Cambiar usuario"></button>
+        <button id="btnBackup" class="chip" title="Exportar backup">💾 Backup</button>
+      </div>
+    </header>
+
+    <main id="main" class="appMain" aria-live="polite"></main>
+
+    <footer class="appFooter">
+      <span id="footerHint"></span>
+    </footer>
+
+    <!-- Modal simple -->
+    <div id="modal" class="modal" aria-hidden="true">
+      <div class="modalBackdrop" data-close="1"></div>
+      <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modalHeader">
+          <div id="modalTitle" class="modalTitle"></div>
+          <button class="iconBtn" data-close="1" aria-label="Cerrar">✕</button>
+        </div>
+        <div id="modalBody" class="modalBody"></div>
+        <div id="modalActions" class="modalActions"></div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

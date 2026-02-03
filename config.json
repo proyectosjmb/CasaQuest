@@ -1,0 +1,143 @@
+{
+  "app": {
+    "name": "CasaQuest",
+    "version": "0.1.0",
+    "locale": "es-MX",
+    "timezone": "America/Mexico_City",
+    "week_starts_on": "mon",
+    "device_mode": "single_computer_local"
+  },
+  "rules": {
+    "no_notifications": true,
+    "one_tap_done": true,
+    "auto_timestamp_on_done": true,
+    "assignment_changes": "suggest_only",
+    "missed_task_policy": "compensate"
+  },
+  "people": [
+    { "id": "papa", "label": "Papá", "soft_deadline": "23:00" },
+    { "id": "mama", "label": "Mamá", "soft_deadline": "23:00" },
+    { "id": "santiago", "label": "Santiago", "soft_deadline": "22:00" }
+  ],
+  "rewards": {
+    "family_weekly_reward": "🎬 Elegir película + 💤 descanso",
+    "kid_weekly_reward": "📱 Tiempo extra de celular + (bonus) elegir película"
+  },
+  "zones": ["Gatos", "Cocina", "Orden", "BossFight"],
+  "tasks": [
+    {
+      "id": "gatos_agua",
+      "name": "🐾 Gatos: Agua (rellenar + enjuagar plato)",
+      "zone": "Gatos",
+      "frequency": "daily",
+      "points": 1,
+      "minutes": 3,
+      "assigned_to": "santiago"
+    },
+    {
+      "id": "gatos_comida_am",
+      "name": "🐾 Gatos: Comida AM",
+      "zone": "Gatos",
+      "frequency": "daily",
+      "points": 1,
+      "minutes": 3,
+      "assigned_to": "mama"
+    },
+    {
+      "id": "gatos_comida_pm",
+      "name": "🐾 Gatos: Comida PM",
+      "zone": "Gatos",
+      "frequency": "daily",
+      "points": 1,
+      "minutes": 3,
+      "assigned_to": "santiago"
+    },
+    {
+      "id": "gatos_arenero_mama",
+      "name": "🐾 Gatos: Arenero (Mamá)",
+      "zone": "Gatos",
+      "frequency": "weekly_days",
+      "days": ["tue", "thu", "sat"],
+      "points": 1,
+      "minutes": 7,
+      "assigned_to": "mama"
+    },
+    {
+      "id": "gatos_arenero_santiago",
+      "name": "🐾 Gatos: Arenero (Santiago)",
+      "zone": "Gatos",
+      "frequency": "weekly_days",
+      "days": ["mon", "wed", "fri"],
+      "points": 1,
+      "minutes": 7,
+      "assigned_to": "santiago"
+    },
+    {
+      "id": "cocina_zona_agua",
+      "name": "🍽️ Cocina: Zona Agua (tarja operable)",
+      "zone": "Cocina",
+      "frequency": "daily",
+      "points": 3,
+      "minutes": 30,
+      "assigned_to": "papa",
+      "notes": "Sin lavavajillas: meta = tarja usable, no perfección."
+    },
+    {
+      "id": "cocina_superficies",
+      "name": "🍽️ Cocina: Superficies (mesa + migajas + estufa rápido)",
+      "zone": "Cocina",
+      "frequency": "daily",
+      "points": 2,
+      "minutes": 8,
+      "assigned_to": "santiago",
+      "notes": "Santiago NO lava trastes; solo orden y wipe rápido."
+    },
+    {
+      "id": "cocina_guardar",
+      "name": "🍽️ Cocina: Guardar/Acomodar (cosas fuera de lugar)",
+      "zone": "Cocina",
+      "frequency": "daily",
+      "points": 1,
+      "minutes": 8,
+      "assigned_to": "mama"
+    },
+    {
+      "id": "orden_reset_papa",
+      "name": "🧹 Reset 10: Orden general (Papá)",
+      "zone": "Orden",
+      "frequency": "daily",
+      "points": 2,
+      "minutes": 10,
+      "assigned_to": "papa"
+    },
+    {
+      "id": "orden_reset_mama",
+      "name": "🧹 Reset 10: Orden general (Mamá)",
+      "zone": "Orden",
+      "frequency": "daily",
+      "points": 2,
+      "minutes": 10,
+      "assigned_to": "mama"
+    },
+    {
+      "id": "orden_reset_santiago",
+      "name": "🧹 Reset 10: Orden general (Santiago)",
+      "zone": "Orden",
+      "frequency": "daily",
+      "points": 2,
+      "minutes": 10,
+      "assigned_to": "santiago"
+    },
+    {
+      "id": "bossfight_25",
+      "name": "🎬 Boss Fight 25: 10 min todos + 15 min foco",
+      "zone": "BossFight",
+      "frequency": "weekly_days",
+      "days": ["sat", "sun"],
+      "points": 5,
+      "minutes": 25,
+      "assigned_to": "papa",
+      "notes": "Se marca 1 vez, pero lo hacen los 3."
+    }
+  ]
+}
