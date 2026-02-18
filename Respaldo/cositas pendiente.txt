@@ -1,0 +1,93 @@
+1. Sistema de Perfiles Simplificado
+Funcionalidad: Tres perfiles de acceso rápido (Papá, Mamá, Hijo) sin contraseñas. Solo un botón para elegir pefil.
+
+4. Semáforo de Estado de la Casa (Visualización en Tiempo Real)
+Funcionalidad: Un indicador visual (barra de progreso de 0 a 100 Y un emoji que cambia) que muestra el nivel de limpieza general de la casa.
+
+Tareas hechas = Casa feliz y barra verde.
+
+Tareas pendientes que ya pasaron de su hora = Casa triste y barra roja.
+
+otras capacidades:
+Misión rápida (5 min)
+Para esos días de “no puedo con mi vida”: la app ofrece una tarea mini (doblar 10 cosas, barrer 1 zona, limpiar mesa, etc.) para que siempre haya avance.
+
+Botón “Cambio” (anti-fricción)
+“Hoy no puedo” → te deja intercambiar con alguien (la app propone swaps justos por puntos). Esto evita el drama y mantiene el sistema vivo.
+
+Racha de 3 días haciendo lo tuyo: “Constancia nivel 1”
+
+Logro familiar: “Semana sin montaña de trastes”
+
+“Boss Fight” semanal (modo cooperativo)
+Una vez por semana: 30–45 min todos (o 2 y 1) con temporizador.
+La app lo presenta como:
+
+“Boss Fight: Casa nivel 1 — objetivo: dejar áreas en modo ‘paz mental’.”
+
+“Power-ups” (comodines)
+Cada quien puede ganar 1 comodín a la semana:
+
+“Cambio gratis” (swap sin costo)
+
+“Misión express” (hacer versión corta válida)
+
+“Doble puntos” si haces una tarea pesada
+
+Próximos pasos:
+
+4. Semáforo de Estado de la Casa (Visualización en Tiempo Real)
+Funcionalidad: Un indicador visual (barra de progreso de 0 a 100 y un emoji que cambia) que muestra el nivel de limpieza general de la casa.
+
+Tareas hechas = Casa feliz/verde.
+
+5. Sistema de Feedback Positivo (Adiós al Capataz)
+Funcionalidad: Micro-animaciones y mensajes aleatorios tras cada check (confeti, sonidos de videojuego, mensajes tipo: "¡Eres un crack, la cocina te lo agradece!").
+
+Objetivo: Refuerzo positivo inmediato. Que el gesto de limpiar termine con una pequeña "recompensa" digital.
+
+Tareas pendientes que ya pasaron de su hora = Casa triste/roja.
+
+Objetivo: Crear responsabilidad colectiva. No es "papá regañándome", es "la casa está en rojo y todos somos responsables".
+
+6. El "Karma Report" (Reporte Semanal de Valor)
+Funcionalidad: Un resumen visual al final de la semana que no solo diga qué se hizo, sino que otorgue títulos:
+
+El MVP de la semana: Quien más puntos sumó.
+
+El Rayo: Quien hizo las tareas más rápido tras ser asignadas.
+
+Objetivo: Convertir el quehacer en una métrica de juego. Esto facilita que la "recompensa real" (ej: elegir la película del domingo) se base en datos justos.
+
+
+
+
+
+
+
+function renderAssignments(){
+  const tasks = state.config.tasks.slice().sort((a,b)=>(a.zone||"").localeCompare(b.zone||""));
+  const rows = tasks.map(t=>`
+    <div class="item">
+      <div class="meta">
+        <div class="name">${escapeHtml(t.name)}</div>
+        <div class="sub">
+          Zona: <b>${escapeHtml(t.zone||"General")}</b> ·
+          Frecuencia: <b>${escapeHtml(t.frequency)}</b> ·
+          Asignado: <b>${escapeHtml(getPersonLabel(t.assigned_to))}</b> ·
+          ${t.points||0} pts · ~${t.minutes||0} min
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  $("#main").innerHTML = `
+    <section class="card">
+      <div class="h1">Asignaciones (solo lectura)</div>
+      <div class="small">En v0.2 haremos “sugerencias” de ajuste, sin cambios automáticos.</div>
+    </section>
+    <section class="card">
+      <div class="list">${rows}</div>
+    </section>
+  `;
+}
