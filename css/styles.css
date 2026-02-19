@@ -244,3 +244,66 @@ body{
   gap:8px;
   align-items:center;
 }
+/* ===========================
+   Mobile polish (CasaQuest)
+   =========================== */
+* { box-sizing: border-box; }
+img, video, canvas { max-width: 100%; height: auto; }
+
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+
+/* Evita que el contenido quede “apretado” */
+#main { padding: 12px; }
+
+/* Top nav: que no se salga de la pantalla */
+.topNav{
+  display: flex;
+  flex-wrap: wrap;         /* clave */
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+/* Tabs: más tocables */
+.tab{
+  flex: 1 1 auto;
+  min-height: 44px;        /* más “touch” */
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+/* Cards más cómodas */
+.card{
+  margin: 10px 0;
+  padding: 12px;
+}
+
+/* List items: evita desbordes */
+.item .name, .item .sub{
+  word-break: break-word;
+}
+
+/* Modales: que quepan en celular */
+.modal-card{
+  width: min(92vw, 520px);
+  max-height: 86vh;
+  overflow: auto;
+}
+
+/* Botones dentro de modales / filas */
+.row{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.btn{
+  min-height: 44px;
+  width: 100%;
+}
+
+/* Ajustes extra solo para pantallas chicas */
+@media (max-width: 640px){
+  .h1{ font-size: 18px; }
+  .small{ font-size: 13px; }
+}
+
