@@ -38,7 +38,7 @@
     "BossFight"
   ],
   "tasks": [
-        {
+    {
       "id": "gatos_agua",
       "name": "🐾 Gatos: Agua (rellenar + enjuagar plato)",
       "zone": "Gatos",
@@ -86,8 +86,7 @@
       "minutes": 7,
       "assigned_to": "santiago"
     },
-
-        {
+    {
       "id": "cocina_zona_agua",
       "name": "🍽️ Cocina: Zona Agua (tarja operable)",
       "zone": "Cocina",
@@ -119,7 +118,6 @@
       "assigned_to": "mama",
       "hide_on_express": true
     },
-
     {
       "id": "cocina_zona_agua_express",
       "name": "⚡🍽️ Cocina Express: Zona Agua (mínimo viable)",
@@ -151,7 +149,6 @@
       "assigned_to": "mama",
       "only_on_express": true
     },
-
     {
       "id": "orden_reset_papa",
       "name": "🧹 Reset 10: Orden general (Papá)",
@@ -181,7 +178,6 @@
       "assigned_to": "santiago",
       "notes": "No incluye lavar trastes."
     },
-
     {
       "id": "pisos_barrer_zona_comun",
       "name": "🧹 Pisos: Barrer zona común (sala/comedor/pasillo)",
@@ -202,7 +198,6 @@
       "assigned_to": "papa",
       "notes": "Si Mamá ya se aventó maratón, Papá lo compensa con esto."
     },
-
     {
       "id": "banio_pb_rapido",
       "name": "🚽 1/2 baño PB: limpieza rápida (lavabo + WC + espejo)",
@@ -223,7 +218,6 @@
       "assigned_to": "papa",
       "notes": "Se puede rotar manualmente con Mamá cada semana (lo sugeriremos en v0.3)."
     },
-
     {
       "id": "ropa_lavanderia",
       "name": "👚 Ropa: Lavandería (lavar/colgar/organizar)",
@@ -245,7 +239,6 @@
       "minutes": 12,
       "assigned_to": "santiago"
     },
-
     {
       "id": "basura_reciclaje",
       "name": "🗑️ Basura/reciclaje (sacar y cambiar bolsa)",
@@ -256,7 +249,6 @@
       "minutes": 8,
       "assigned_to": "papa"
     },
-
     {
       "id": "escaleras_barrer",
       "name": "🪜 Escaleras: barrer rápido",
@@ -294,7 +286,6 @@
       "assigned_to": "papa",
       "notes": "Objetivo: avanzar, no terminar."
     },
-
     {
       "id": "bossfight_25",
       "name": "🎬 Boss Fight 25: 10 min todos + 15 min foco",
@@ -306,5 +297,17 @@
       "assigned_to": "papa",
       "notes": "Se marca 1 vez, pero lo hacen los 3. Premio moral: escoger peli."
     }
-  ]
+  ],
+  "cloud": {
+    "enabled": true,
+    "houseId": "casaquest-a01b8967-2e62-432f-a2ce-4eb8dd2183d4",
+    "firebaseConfig": {
+      "apiKey": "AIzaSyBrAz_nm7m6PcffUq2r5_76f_vI-woWWv8",
+      "authDomain": "casaquest-c232e.firebaseapp.com",
+      "projectId": "casaquest-c232e",
+      "storageBucket": "casaquest-c232e.firebasestorage.app",
+      "messagingSenderId": "539875769586",
+      "appId": "1:539875769586:web:6568999b5fe4116ce8646b"
+    }
+  }
 }

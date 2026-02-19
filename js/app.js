@@ -7,7 +7,7 @@
  * - Ajustes: cambiar usuario + importar/exportar backup
  */
 
-import { getLogs, addLog, removeLastLog, getPrefs, setPrefs, exportBackup, importBackupFromFile } from "./storage.js";
+import { getLogs as getLocalLogs, addLog, removeLastLog, getPrefs, setPrefs, exportBackup, importBackupFromFile } from "./storage.js";
 import { dateKey, dowKey, weekKey } from "./time.js";
 import { $, escapeHtml, toast, openModal, closeModal, wireModalClose } from "./ui.js";
 import { getTimerState, setTimerState, clearTimerState } from "./storage.js";
@@ -16,7 +16,9 @@ import { getConfigOverride, setConfigOverride, clearConfigOverride } from "./sto
 
 const state = {
   config: null,
-  prefs: null
+  prefs: null,
+  cloudEnabled: false,
+  cloudLogs: null
 };
 let timerTickHandle = null;
 
@@ -220,6 +222,11 @@ function nowContext(){
     dow: dowKey(now, tz)
   };
 }
+
+function getLogs(){
+  if(Array.isArray(state.cloudLogs)) return state.cloudLogs;
+  return getLocalLogs();
+}
 function isTaskVisibleByMode(task){
   const on = !!state.prefs.expressEnabled;
   if(on && task.hide_on_express) return false;
@@ -283,7 +290,7 @@ function isDoneToday(task, ctx){
   return logsForTaskOnDate(task.id, ctx.dk).length > 0;
 }
 
-function markDone(task){
+async function markDone(task){
   const ctx = nowContext();
   const log = {
     id: crypto.randomUUID(),
@@ -296,12 +303,54 @@ function markDone(task){
     points: task.points || 0,
     minutes: task.minutes || 0
   };
+
+  if(state.cloudEnabled === true && window.CQCloud){
+    try{
+      const { id: _localId, ...cloudLog } = log;
+      await window.CQCloud.addLog(cloudLog);
+      toast(`✅ Hecho: ${task.name}`);
+      return;
+    }catch(err){
+      console.error(err);
+      toast("❌ No se pudo guardar en nube");
+      return;
+    }
+  }
+
   addLog(log);
   toast(`✅ Hecho: ${task.name}`);
   render();
 }
 
-function undoLastForTask(taskId){
+async function undoLastForTask(taskId){
+  if(state.cloudEnabled === true && window.CQCloud){
+    const taskLogs = getLogs().filter(l => l.taskId === taskId);
+    if(!taskLogs.length) return;
+
+    const withCreatedAt = taskLogs.filter(l => Number.isFinite(Number(l.createdAt)));
+    let last = null;
+
+    if(withCreatedAt.length){
+      last = withCreatedAt
+        .slice()
+        .sort((a,b)=> Number(a.createdAt) - Number(b.createdAt))
+        .at(-1);
+    }else{
+      last = taskLogs[taskLogs.length - 1];
+    }
+
+    if(last?.id){
+      try{
+        await window.CQCloud.deleteLog(last.id);
+        toast("↩️ Deshecho");
+      }catch(err){
+        console.error(err);
+        toast("❌ No se pudo deshacer en nube");
+      }
+    }
+    return;
+  }
+
   removeLastLog(l => l.taskId === taskId);
   toast("↩️ Deshecho");
   render();
@@ -321,6 +370,24 @@ function renderHeaderUser(){
 
 
 function renderTabs(){
+  const nav = document.querySelector(".topNav");
+  if(nav && !nav.querySelector('.tab[data-route="week"]')){
+    const btn = document.createElement("button");
+    btn.className = "tab";
+    btn.dataset.route = "week";
+    btn.textContent = "Semana";
+
+    // ✅ Insertar "Semana" justo después de "Hoy"
+    const hoyBtn = nav.querySelector('.tab[data-route="today"]');
+    if(hoyBtn && hoyBtn.nextSibling){
+      nav.insertBefore(btn, hoyBtn.nextSibling);
+    }else if(hoyBtn){
+      nav.appendChild(btn); // si "Hoy" es el último, queda al final
+    }else{
+      nav.insertBefore(btn, nav.firstChild); // si no existe "Hoy", lo ponemos al inicio
+    }
+  }
+
   const route = state.prefs.route;
   document.querySelectorAll(".tab").forEach(b=>{
     const r = b.dataset.route;
@@ -504,6 +571,107 @@ function renderToday(){
   `;
 }
 
+/** ---------- Pantalla: Semana ---------- */
+function renderWeekPlan(){
+  const ctx = nowContext();
+  const logs = getLogs();
+
+  if(!state.prefs.currentUserId){
+    state.prefs.currentUserId = state.config.people?.[0]?.id || "papa";
+    setPrefs(state.prefs);
+    renderHeaderUser();
+  }
+
+  const activeId = state.prefs.currentUserId;
+  const tz = ctx.tz;
+  const DOW_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const DOW_LABEL = {
+    mon: "Lun", tue: "Mar", wed: "Mie", thu: "Jue", fri: "Vie", sat: "Sab", sun: "Dom"
+  };
+
+  function parseDateKey(dk){
+    const [y,m,d] = String(dk || "").split("-").map(Number);
+    return new Date(Date.UTC(y, (m || 1) - 1, d || 1, 12, 0, 0));
+  }
+
+  function addDays(dk, delta){
+    const base = parseDateKey(dk);
+    return new Date(base.getTime() + delta * 86400000);
+  }
+
+  function isDueOnDow(task, dow){
+    if(task.frequency === "daily") return true;
+    if(task.frequency === "weekly_days") return (task.days || []).includes(dow);
+    return false;
+  }
+
+  function isDoneOnDate(taskId, dk){
+    return logs.some(l => l.taskId === taskId && l.dateKey === dk);
+  }
+
+  const assignedTasks = (state.config.tasks || [])
+    .filter(t => isTaskVisibleByMode(t))
+    .filter(t => t.assigned_to === activeId)
+    .filter(t => t.frequency === "daily" || t.frequency === "weekly_days")
+    .slice()
+    .sort((a,b)=> (a.zone || "").localeCompare(b.zone || "") || (a.name || "").localeCompare(b.name || ""));
+
+  const tomorrowDate = addDays(ctx.dk, 1);
+  const tomorrowKey = dateKey(tomorrowDate, tz);
+  const tomorrowDow = dowKey(tomorrowDate, tz);
+  const tomorrowTasks = assignedTasks.filter(t => isDueOnDow(t, tomorrowDow));
+
+  const renderTaskItem = (task, dk)=>{
+    const done = isDoneOnDate(task.id, dk);
+    return `
+      <div class="item ${done ? "done" : ""}">
+        <div class="check" aria-hidden="true">${done ? "✅" : ""}</div>
+        <div class="meta">
+          <div class="name">${escapeHtml(task.name)}</div>
+          <div class="sub">Zona: <b>${escapeHtml(task.zone || "General")}</b> · ${Number(task.points || 0)} pts · ~${Number(task.minutes || 0)} min</div>
+        </div>
+      </div>
+    `;
+  };
+
+  const tomorrowRows = tomorrowTasks.length
+    ? tomorrowTasks.map(t => renderTaskItem(t, tomorrowKey)).join("")
+    : `<div class="small">No tienes tareas asignadas para mañana.</div>`;
+
+  const dayIndex = Math.max(0, DOW_ORDER.indexOf(ctx.dow));
+  const mondayDate = addDays(ctx.dk, -dayIndex);
+
+  const weekCards = DOW_ORDER.map((dow, idx)=>{
+    const dayDate = new Date(mondayDate.getTime() + idx * 86400000);
+    const dk = dateKey(dayDate, tz);
+    const dayTasks = assignedTasks.filter(t => isDueOnDow(t, dow));
+    const rows = dayTasks.length
+      ? dayTasks.map(t => renderTaskItem(t, dk)).join("")
+      : `<div class="small">Sin tareas.</div>`;
+
+    return `
+      <article class="card" style="flex:1 1 240px;margin-bottom:0">
+        <div class="h1">${escapeHtml(DOW_LABEL[dow])}</div>
+        <div class="small">${escapeHtml(dk)}</div>
+        <div class="list">${rows}</div>
+      </article>
+    `;
+  }).join("");
+
+  $("#main").innerHTML = `
+    <section class="card">
+      <div class="h1">Mañana (${escapeHtml(tomorrowKey)})</div>
+      <div class="small">Plan de <b>${escapeHtml(getPersonLabel(activeId))}</b></div>
+      <div class="list">${tomorrowRows}</div>
+    </section>
+
+    <section class="card">
+      <div class="h1">Semana (Lun-Dom)</div>
+      <div class="small">Tareas asignadas a <b>${escapeHtml(getPersonLabel(activeId))}</b></div>
+      <div class="row" style="align-items:stretch">${weekCards}</div>
+    </section>
+  `;
+}
 /** ---------- Pantalla: Resumen ---------- */
 function renderSummary(){
   const ctx = nowContext();
@@ -822,6 +990,7 @@ function render(){
 
   const route = state.prefs.route;
   if(route === "today") return renderToday();
+  if(route === "week") return renderWeekPlan();
   if(route === "summary") return renderSummary();
   if(route === "assignments") return renderAssignments();
   if(route === "settings") return renderSettings();
@@ -925,8 +1094,10 @@ function openTaskEditor(task){
 /** ---------- Eventos ---------- */
 function wireEvents(){
   // Tabs
-  document.querySelectorAll(".tab").forEach(b=>{
-    b.addEventListener("click", ()=> setRoute(b.dataset.route));
+  document.querySelector(".topNav")?.addEventListener("click", (e)=>{
+    const tab = e.target.closest(".tab");
+    if(!tab) return;
+    setRoute(tab.dataset.route);
   });
   // Timer Dock
   $("#btnTimerPause")?.addEventListener("click", ()=> toggleTimerPause());
@@ -998,7 +1169,7 @@ function wireEvents(){
         return;
       }
 
-      markDone(task);
+      await markDone(task);
       closeModal();
       return;
     }
@@ -1020,13 +1191,13 @@ function wireEvents(){
         return;
       }
 
-      markDone(task);
+      await markDone(task);
       return;
     }
 
     if(action === "undo"){
       const taskId = el.dataset.task;
-      undoLastForTask(taskId);
+      await undoLastForTask(taskId);
       return;
     }
 
@@ -1208,6 +1379,23 @@ async function boot(){
 
   // Prefs
   state.prefs = getPrefs();
+
+  try{
+    const cloudApi = window.CQCloud;
+    if(cloudApi && cloudApi.isEnabled(state.config.cloud)){
+      await cloudApi.init(state.config.cloud, (logs)=>{
+        state.cloudLogs = Array.isArray(logs) ? logs : [];
+        render();
+      });
+      state.cloudEnabled = true;
+    }else{
+      state.cloudEnabled = false;
+    }
+  }catch(err){
+    state.cloudEnabled = false;
+    state.cloudLogs = null;
+    console.error(err);
+  }
 
   // default user: si no hay, usa Papá (puedes cambiarlo)
   if(!state.prefs.currentUserId){
