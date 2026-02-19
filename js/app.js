@@ -408,43 +408,49 @@ function renderTabs(){
   const nav = document.querySelector(".topNav");
   if(!nav) return;
 
-  // Asegura acordeón (mueve los botones tab adentro del panel)
-  ensureTabAccordion();
-
-  // Donde debemos meter tabs (si existe panel, ahí; si no, en nav)
-  const panel = nav.querySelector(".tabAccordionPanel");
-  const container = panel || nav;
-
-  // Asegura botón Semana (en el contenedor correcto)
-  if(!container.querySelector('.tab[data-route="week"]')){
-    const btn = document.createElement("button");
-    btn.className = "tab";
-    btn.dataset.route = "week";
-    btn.textContent = "Semana";
-    container.appendChild(btn);
+  // 1) Botón toggle (solo lo crea una vez)
+  if(!nav.querySelector("#btnTabsToggle")){
+    const t = document.createElement("button");
+    t.id = "btnTabsToggle";
+    t.className = "tab";
+    t.type = "button";
+    t.textContent = "☰ Menú";
+    nav.prepend(t);
   }
 
-  // Marca tab activa
+  // 2) Asegura tab Semana (y lo pone justo después de Hoy)
+  let weekBtn = nav.querySelector('.tab[data-route="week"]');
+  const todayBtn = nav.querySelector('.tab[data-route="today"]');
+
+  if(!weekBtn){
+    weekBtn = document.createElement("button");
+    weekBtn.className = "tab";
+    weekBtn.dataset.route = "week";
+    weekBtn.type = "button";
+    weekBtn.textContent = "Semana";
+    nav.appendChild(weekBtn);
+  }
+
+  // Reacomoda: semana inmediatamente después de Hoy
+  if(todayBtn && weekBtn && todayBtn.nextElementSibling !== weekBtn){
+    todayBtn.insertAdjacentElement("afterend", weekBtn);
+  }
+
+  // 3) Marca tab activa
   const route = state.prefs.route;
-  document.querySelectorAll(".tab").forEach(b=>{
+  nav.querySelectorAll('.tab[data-route]').forEach(b=>{
     const r = b.dataset.route;
     b.setAttribute("aria-current", r === route ? "page" : "false");
   });
 
-  // Actualiza texto del acordeón con la pestaña activa
-  const active = document.querySelector('.tab[aria-current="page"]');
-  const summary = document.querySelector("#tabAccordionSummary");
-  if(summary && active){
-    summary.textContent = active.textContent.trim();
-  }
-
-  // En desktop lo dejamos abierto; en mobile cerrado por default
-  const details = nav.querySelector(".tabAccordion");
-  if(details){
-    const isMobile = window.matchMedia("(max-width: 640px)").matches;
-    details.open = !isMobile;
+  // 4) Cambia el texto del botón toggle para que diga dónde estás
+  const active = nav.querySelector('.tab[data-route][aria-current="page"]');
+  const toggle = nav.querySelector("#btnTabsToggle");
+  if(toggle && active){
+    toggle.textContent = `☰ ${active.textContent.trim()}`;
   }
 }
+
 
   const route = state.prefs.route;
   document.querySelectorAll(".tab").forEach(b=>{
@@ -1151,18 +1157,31 @@ function openTaskEditor(task){
 
 /** ---------- Eventos ---------- */
 function wireEvents(){
-  // Tabs
+  // Tabs (delegación: funciona aunque se creen/muevan botones)
   document.querySelector(".topNav")?.addEventListener("click", (e)=>{
-    const tab = e.target.closest(".tab");
+    // Toggle acordeón
+    const toggle = e.target.closest("#btnTabsToggle");
+    if(toggle){
+      document.querySelector(".topNav")?.classList.toggle("tabs-open");
+      return;
+    }
+
+    // Click en un tab real
+    const tab = e.target.closest('.tab[data-route]');
     if(!tab) return;
+
     setRoute(tab.dataset.route);
+
+    // En móvil: cerrar acordeón al elegir
+    document.querySelector(".topNav")?.classList.remove("tabs-open");
   });
+
   // Timer Dock
   $("#btnTimerPause")?.addEventListener("click", ()=> toggleTimerPause());
   $("#btnTimerStop")?.addEventListener("click", ()=> stopTimer());
 
   // Botón usuario
-  $("#btnUser").addEventListener("click", ()=>{
+  $("#btnUser")?.addEventListener("click", ()=>{
     const btns = state.config.people.map(p=>`
       <button class="btn primary" data-action="pickUser" data-user="${escapeHtml(p.id)}">👤 ${escapeHtml(p.label)}</button>
     `).join("");
@@ -1175,7 +1194,7 @@ function wireEvents(){
   });
 
   // Modo Express (toggle)
-  $("#btnExpress").addEventListener("click", ()=>{
+  $("#btnExpress")?.addEventListener("click", ()=>{
     state.prefs.expressEnabled = !state.prefs.expressEnabled;
     setPrefs(state.prefs);
     toast(state.prefs.expressEnabled ? "⚡ Express ON" : "⚡ Express OFF");
@@ -1184,7 +1203,7 @@ function wireEvents(){
   });
 
   // Backup
-  $("#btnBackup").addEventListener("click", ()=>{
+  $("#btnBackup")?.addEventListener("click", ()=>{
     exportBackup(state.config);
     toast("💾 Backup exportado");
   });
@@ -1292,6 +1311,7 @@ function wireEvents(){
   });
 
   wireModalClose();
+
   // Guardar / Eliminar tarea desde el modal
   document.addEventListener("click", (e)=>{
     const btn = e.target.closest("[data-action='saveTask'], [data-action='deleteTask']");
@@ -1414,16 +1434,7 @@ function wireEvents(){
       e.target.value = "";
     }
   });
-  document.addEventListener("click", (e)=>{
-  const tab = e.target.closest(".tab");
-  if(!tab) return;
-  const details = document.querySelector(".tabAccordion");
-  if(details && window.matchMedia("(max-width: 640px)").matches){
-    details.open = false;
-  }
-});
 }
-
 
 /** ---------- Arranque ---------- */
 async function boot(){
