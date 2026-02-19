@@ -367,26 +367,84 @@ function renderHeaderUser(){
     bx.textContent = state.prefs.expressEnabled ? "⚡ Express: ON" : "⚡ Express: OFF";
   }
 }
+function ensureTabAccordion(){
+  const nav = document.querySelector(".topNav");
+  if(!nav) return;
+
+  // Si ya existe, nada
+  if(nav.querySelector(".tabAccordion")) return;
+
+  const tabs = Array.from(nav.querySelectorAll("button.tab"));
+  if(!tabs.length) return;
+
+  const details = document.createElement("details");
+  details.className = "tabAccordion";
+
+  const summary = document.createElement("summary");
+  summary.className = "tabAccordionSummary";
+  summary.id = "tabAccordionSummary";
+  summary.textContent = "Menú";
+
+  const panel = document.createElement("div");
+  panel.className = "tabAccordionPanel";
+
+  // Mueve los tabs existentes al panel
+  tabs.forEach(btn => panel.appendChild(btn));
+
+  details.appendChild(summary);
+  details.appendChild(panel);
+
+  // Limpia y mete el acordeón
+  nav.innerHTML = "";
+  nav.appendChild(details);
+
+  // En desktop lo dejamos abierto para que se vea normal
+  const isMobile = window.matchMedia("(max-width: 640px)").matches;
+  details.open = !isMobile;
+}
 
 
 function renderTabs(){
   const nav = document.querySelector(".topNav");
-  if(nav && !nav.querySelector('.tab[data-route="week"]')){
+  if(!nav) return;
+
+  // Asegura acordeón (mueve los botones tab adentro del panel)
+  ensureTabAccordion();
+
+  // Donde debemos meter tabs (si existe panel, ahí; si no, en nav)
+  const panel = nav.querySelector(".tabAccordionPanel");
+  const container = panel || nav;
+
+  // Asegura botón Semana (en el contenedor correcto)
+  if(!container.querySelector('.tab[data-route="week"]')){
     const btn = document.createElement("button");
     btn.className = "tab";
     btn.dataset.route = "week";
     btn.textContent = "Semana";
-
-    // ✅ Insertar "Semana" justo después de "Hoy"
-    const hoyBtn = nav.querySelector('.tab[data-route="today"]');
-    if(hoyBtn && hoyBtn.nextSibling){
-      nav.insertBefore(btn, hoyBtn.nextSibling);
-    }else if(hoyBtn){
-      nav.appendChild(btn); // si "Hoy" es el último, queda al final
-    }else{
-      nav.insertBefore(btn, nav.firstChild); // si no existe "Hoy", lo ponemos al inicio
-    }
+    container.appendChild(btn);
   }
+
+  // Marca tab activa
+  const route = state.prefs.route;
+  document.querySelectorAll(".tab").forEach(b=>{
+    const r = b.dataset.route;
+    b.setAttribute("aria-current", r === route ? "page" : "false");
+  });
+
+  // Actualiza texto del acordeón con la pestaña activa
+  const active = document.querySelector('.tab[aria-current="page"]');
+  const summary = document.querySelector("#tabAccordionSummary");
+  if(summary && active){
+    summary.textContent = active.textContent.trim();
+  }
+
+  // En desktop lo dejamos abierto; en mobile cerrado por default
+  const details = nav.querySelector(".tabAccordion");
+  if(details){
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    details.open = !isMobile;
+  }
+}
 
   const route = state.prefs.route;
   document.querySelectorAll(".tab").forEach(b=>{
@@ -1356,6 +1414,14 @@ function wireEvents(){
       e.target.value = "";
     }
   });
+  document.addEventListener("click", (e)=>{
+  const tab = e.target.closest(".tab");
+  if(!tab) return;
+  const details = document.querySelector(".tabAccordion");
+  if(details && window.matchMedia("(max-width: 640px)").matches){
+    details.open = false;
+  }
+});
 }
 
 
