@@ -457,14 +457,6 @@ function renderTabs(){
 }
 
 
-
-  const route = state.prefs.route;
-  document.querySelectorAll(".tab").forEach(b=>{
-    const r = b.dataset.route;
-    b.setAttribute("aria-current", r === route ? "page" : "false");
-  });
-}
-
 /** ---------- Pantalla: Hoy ---------- */
 function renderToday(){
   const ctx = nowContext();
