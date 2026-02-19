@@ -284,7 +284,7 @@ body { margin: 0; }
 }
 
 /* Modales: que quepan en celular */
-.modal-card{
+.modalCard{
   width: min(92vw, 520px);
   max-height: 86vh;
   overflow: auto;
@@ -307,61 +307,44 @@ body { margin: 0; }
   .small{ font-size: 13px; }
 }
 /* ===========================
-   Mobile: Tabs en acordeón
+   Tabs acordeón (mobile-safe)
    =========================== */
-.tabAccordion { position: relative; }
 
-.tabAccordionSummary{
-  list-style: none;
-  cursor: pointer;
-  user-select: none;
-  min-height: 44px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
+/* Por default: escritorio normal */
+#btnTabsToggle { display: none; }
 
-/* quita el triangulito default en algunos navegadores */
-.tabAccordionSummary::-webkit-details-marker{ display:none; }
-
-/* Panel desplegable */
-.tabAccordionPanel{
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-top: 10px;
-}
-
-/* En móvil: el panel se vuelve overlay para no ocupar espacio fijo */
 @media (max-width: 640px){
-  .tabAccordion[open] .tabAccordionPanel{
-    position: absolute;
-    right: 0;
-    top: calc(100% + 8px);
-    width: min(72vw, 260px);
-    padding: 12px;
-    border-radius: 18px;
-    z-index: 999;
+  /* Modo móvil: apilado */
+  .topNav{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
-  /* Los tabs dentro del panel ocupan ancho */
-  .tabAccordionPanel .tab{
+  /* Botón del acordeón visible */
+  #btnTabsToggle{
+    display: inline-flex;
     width: 100%;
     min-height: 44px;
   }
-}
 
-/* En pantallas grandes: se queda “abierto” (se ve normal) */
-@media (min-width: 641px){
-  .tabAccordionSummary{ display:none; }
-  .tabAccordionPanel{
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding-top: 0;
+  /* Oculta todos los tabs */
+  .topNav .tab[data-route]{
+    display: none;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Muestra SOLO el tab activo */
+  .topNav .tab[data-route][aria-current="page"]{
+    display: inline-flex;
+  }
+
+  /* Si está abierto el acordeón, muestra TODOS */
+  .topNav.tabs-open .tab[data-route]{
+    display: inline-flex;
   }
 }
+
 
 
