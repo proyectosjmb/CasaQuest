@@ -449,7 +449,13 @@ function renderTabs(){
   if(toggle && active){
     toggle.textContent = `☰ ${active.textContent.trim()}`;
   }
+
+  // 5) En móvil, por seguridad cerramos el panel tras cualquier re-render
+  if(window.matchMedia("(max-width: 640px)").matches){
+    nav.classList.remove("tabs-open");
+  }
 }
+
 
 
   const route = state.prefs.route;
