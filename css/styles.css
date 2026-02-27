@@ -53,6 +53,14 @@ img, video, canvas{ max-width: 100%; height: auto; }
 }
 .appName{ font-weight:900; }
 .tagline{ font-size:12px; color:var(--muted); margin-top:2px; }
+.navRow{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-left:auto;
+  flex-wrap:wrap;
+}
+.navRow .topNav{ min-width:0; }
 
 /* Top nav */
 .topNav{
@@ -264,6 +272,24 @@ img, video, canvas{ max-width: 100%; height: auto; }
 @media (max-width: 640px){
   /* Evita que el contenido quede “apretado” */
   #main{ padding: 12px; }
+
+  .navRow{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .navRow .topNav{
+    flex:1 1 220px;
+    min-width:0;
+  }
+  .navRow .headerRight{
+    margin-left:auto;
+    justify-content:flex-end;
+  }
+  .headerRight .chip{ white-space:nowrap; }
 
   /* Tabs: más tocables */
   .tab{
