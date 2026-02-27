@@ -41,6 +41,12 @@ img, video, canvas{ max-width: 100%; height: auto; }
   z-index: 5;
   backdrop-filter: blur(10px);
   flex-wrap: wrap; /* importante para móvil */
+  transition: transform .22s ease, opacity .22s ease;
+}
+.appHeader.headerHidden{
+  transform: translateY(calc(-100% - 16px));
+  opacity: 0;
+  pointer-events: none;
 }
 
 .brand{ display:flex; gap:10px; align-items:center; }
@@ -280,6 +286,15 @@ img, video, canvas{ max-width: 100%; height: auto; }
 @media (max-width: 640px){
   /* Evita que el contenido quede “apretado” */
   #main{ padding: 12px; }
+  .appHeader{
+    position: fixed;
+    top: 10px;
+    left: 14px;
+    right: 14px;
+    z-index: 80;
+  }
+  #headerSpacer{ height: 0; }
+
 
   .navRow{
     flex-wrap:nowrap;

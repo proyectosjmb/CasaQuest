@@ -1434,6 +1434,71 @@ function wireEvents() {
   });
 }
 
+function wireAutoHideHeader() {
+  const header = document.querySelector(".appHeader");
+  if (!header) return;
+
+  let spacer = document.getElementById("headerSpacer");
+  if (!spacer) {
+    spacer = document.createElement("div");
+    spacer.id = "headerSpacer";
+    header.insertAdjacentElement("afterend", spacer);
+  }
+
+  const isMobile = () => window.matchMedia("(max-width: 640px)").matches;
+  const setVisible = (visible) => {
+    header.classList.toggle("headerHidden", !visible);
+  };
+
+  const syncSpacer = () => {
+    if (isMobile()) {
+      spacer.style.height = `${header.offsetHeight + 12}px`;
+    } else {
+      spacer.style.height = "0px";
+      setVisible(true);
+    }
+  };
+
+  let lastY = window.scrollY || 0;
+  let ticking = false;
+
+  const onScroll = () => {
+    const y = window.scrollY || 0;
+
+    if (!isMobile()) {
+      setVisible(true);
+      lastY = y;
+      return;
+    }
+
+    syncSpacer();
+
+    if (y <= 10) {
+      setVisible(true);
+      lastY = y;
+      return;
+    }
+
+    const delta = y - lastY;
+    if (delta > 8) setVisible(false);
+    else if (delta < -8) setVisible(true);
+
+    lastY = y;
+  };
+
+  const onScrollRaf = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      onScroll();
+      ticking = false;
+    });
+  };
+
+  syncSpacer();
+  window.addEventListener("resize", syncSpacer);
+  window.addEventListener("scroll", onScrollRaf, { passive: true });
+}
 /** ---------- Arranque ---------- */
 async function boot() {
   // Cargar config
@@ -1484,6 +1549,7 @@ async function boot() {
   renderHeaderUser();
   wireEvents();
   render();
+  wireAutoHideHeader();
 }
 
 boot();
