@@ -56,11 +56,19 @@ img, video, canvas{ max-width: 100%; height: auto; }
 .navRow{
   display:flex;
   align-items:center;
-  gap:12px;
-  margin-left:auto;
-  flex-wrap:wrap;
+  gap:10px;
+  width:100%;
 }
-.navRow .topNav{ min-width:0; }
+.navRow .topNav{
+  flex:1;
+  min-width:0;
+}
+.navRow .headerRight{
+  flex:0 0 auto;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
 
 /* Top nav */
 .topNav{
@@ -274,22 +282,21 @@ img, video, canvas{ max-width: 100%; height: auto; }
   #main{ padding: 12px; }
 
   .navRow{
-    width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    flex-wrap:wrap;
+    flex-wrap:nowrap;
+    gap:8px;
   }
   .navRow .topNav{
-    flex:1 1 220px;
-    min-width:0;
+    flex:1;
   }
   .navRow .headerRight{
-    margin-left:auto;
-    justify-content:flex-end;
+    flex-wrap:nowrap;
+    gap:6px;
   }
-  .headerRight .chip{ white-space:nowrap; }
+  .headerRight .chip{
+    white-space:nowrap;
+    padding:6px 8px;
+    font-size:12px;
+  }
 
   /* Tabs: más tocables */
   .tab{
@@ -335,30 +342,41 @@ img, video, canvas{ max-width: 100%; height: auto; }
 @media (max-width: 640px){
   .topNav{
     display:flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 16px;
+    flex-direction:row;
+    flex-wrap:nowrap;
+    gap:8px;
+    padding:6px;
+    border-radius:999px;
   }
 
   #btnTabsToggle{
-    display: inline-flex;
-    width: 100%;
-    min-height: 44px;
-    justify-content: center;
+    display:inline-flex;
+    flex:1;
+    width:auto;
+    min-height:44px;
+    justify-content:center;
   }
 
   .topNav .tab[data-route]{
-    display: none;
-    width: 100%;
-    min-height: 44px;
+    display:none;
   }
 
-  .topNav .tab[data-route][aria-current="page"]{
-    display: inline-flex;
+  .topNav .tab[data-route][aria-current="page"]{ display:none; }
+
+  .topNav.tabs-open{
+    flex-direction:column;
+    align-items:stretch;
+    width:100%;
+  }
+
+  .topNav.tabs-open #btnTabsToggle{
+    width:100%;
+    flex:0 0 auto;
   }
 
   .topNav.tabs-open .tab[data-route]{
-    display: inline-flex;
+    display:inline-flex;
+    width:100%;
+    min-height:44px;
   }
 }
