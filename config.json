@@ -324,8 +324,7 @@
       "minutes": 15,
       "assigned_to": "papa",
       "days": [
-        "mon",
-        "thu"
+        "wed"
       ]
     },
     {
@@ -337,8 +336,7 @@
       "minutes": 15,
       "assigned_to": "papa",
       "days": [
-        "fri",
-        "sun"
+        "sat"
       ]
     },
     {
@@ -386,7 +384,6 @@
       "minutes": 15,
       "assigned_to": "mama",
       "days": [
-        "tue",
         "thu",
         "sun"
       ]
@@ -410,6 +407,7 @@
       "assigned_to": "papa",
       "days": [
         "mon",
+        "tue",
         "wed",
         "fri",
         "sat"
@@ -524,7 +522,6 @@
       "minutes": 20,
       "assigned_to": "mama",
       "days": [
-        "tue",
         "fri"
       ]
     },
@@ -649,10 +646,15 @@
       "name": "🧺📦✨ Cocina: Guardar/Acomodar (cosas fuera de lugar)",
       "zone": "Cocina",
       "assigned_to": "papa",
-      "frequency": "daily",
+      "frequency": "weekly_days",
       "points": 10,
       "minutes": 15,
-      "hide_on_express": true
+      "hide_on_express": true,
+      "days": [
+        "mon",
+        "wed",
+        "sat"
+      ]
     },
     {
       "id": "t_cocina_zona_agua_tarja_operable_mama_express",
@@ -741,6 +743,33 @@
       "minutes": 25,
       "assigned_to": "papa",
       "notes": "Se marca 1 vez, pero lo hacen los 3. Premio moral: escoger peli."
+    },
+    {
+      "id": "bossfight_energia_ejercicio_subir_nivel",
+      "name": "⚡🏋️‍♂️ Energía: Ejercicio (subir nivel)",
+      "zone": "BossFight",
+      "assigned_to": "mama",
+      "frequency": "weekly_days",
+      "points": 1,
+      "minutes": 10,
+      "days": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
+    },
+    {
+      "id": "banos_bano_pa_pasillo_y_escalera_barrer_y_trap",
+      "name": "🧹🧼🚿 Baño PA, Pasillo y escalera: barrer y trapear",
+      "zone": "Escaleras",
+      "assigned_to": "papa",
+      "frequency": "weekly",
+      "points": 20,
+      "minutes": 20
     }
   ],
   "cloud": {
